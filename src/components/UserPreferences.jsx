@@ -11,13 +11,13 @@ import {
   } from '@mui/material';
   import DeleteIcon from '@mui/icons-material/Delete';
   
-  function UserPreferences({ units, setUnits, favorites, setFavorites }) {
+  function UserPreferences({ units, setUnits, favorites, onAddFavorite, onRemoveFavorite }) {
     const handleUnitChange = (event) => {
       setUnits(event.target.value);
     };
   
     const handleRemoveFavorite = (location) => {
-      setFavorites(favorites.filter(fav => fav !== location));
+      onRemoveFavorite(location);
     };
   
     return (

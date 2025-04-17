@@ -5,7 +5,7 @@ import CurrentWeather from './CurrentWeather';
 import WeatherForecast from './WeatherForecast';
 import { fetchWeatherData } from '../services/weatherApi';
 
-function WeatherDashboard({ units, favorites }) {
+function WeatherDashboard({ units, favorites, onAddFavorite, onRemoveFavorite }) {
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -25,7 +25,12 @@ function WeatherDashboard({ units, favorites }) {
 
   return (
     <Box sx={{ flexGrow: 1, mt: 3 }}>
-      <WeatherSearch onSearch={handleLocationSearch} favorites={favorites} />
+      <WeatherSearch 
+        onSearch={handleLocationSearch} 
+        onAddFavorite={onAddFavorite} 
+        onRemoveFavorite={onRemoveFavorite} 
+        favorites={favorites} 
+      />
       
       {error && (
         <Typography color="error" sx={{ mt: 2 }}>

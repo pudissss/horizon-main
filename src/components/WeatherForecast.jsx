@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Typography, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { Line } from 'react-chartjs-2';
 import {
@@ -27,10 +27,23 @@ function WeatherForecast({ data, units }) {
   
   if (!data || !data.list) return null;
 
+  const convertTemp = (temp) => {
+    if (units === 'imperial') {
+      return (temp * 9/5) + 32;
+    }
+    return temp;
+  };
+
   const tempUnit = units === 'metric' ? '°C' : '°F';
   
   const processData = () => {
-    const forecastData = data.list.slice(0, forecastType === 'hourly' ? 8 : 7);
+    const forecastData = data.list.slice(0, forecastType === 'hourly' ? 8 : 7).map(item => ({
+      ...item,
+      main: {
+        ...item.main,
+        temp: convertTemp(item.main.temp)
+      }
+    }));
     
     return {
       labels: forecastData.map(item => {

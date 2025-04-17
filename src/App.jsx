@@ -23,19 +23,59 @@ function App() {
     const saved = localStorage.getItem('units');
     return saved || 'metric';
   });
+
+  const [weatherData, setWeatherData] = useState({}); // State to store weather data for all favorites
+
   const handleAddFavorite = (location) => {
-    if (!favorites.includes(location)) {
-      setFavorites([...favorites, location]);
+    const trimmedLocation = location.trim();
+    const normalizedLocation = trimmedLocation.toLowerCase();
+
+    if (!favorites.some(fav => fav.toLowerCase() === normalizedLocation)) {
+      const updatedFavorites = [...favorites, trimmedLocation];
+      setFavorites(updatedFavorites);
     }
   };
 
   const handleRemoveFavorite = (location) => {
-    setFavorites(favorites.filter(fav => fav !== location));
+    const trimmedLocation = location.trim();
+    const normalizedLocation = trimmedLocation.toLowerCase();
+
+    const updatedFavorites = favorites.filter(fav => fav.toLowerCase() !== normalizedLocation);
+    setFavorites(updatedFavorites);
   };
+
   useEffect(() => {
+    console.log('Saving to localStorage:', { favorites, units });
     localStorage.setItem('favorites', JSON.stringify(favorites));
     localStorage.setItem('units', units);
   }, [favorites, units]);
+
+  const fetchWeatherData = (location, units) => {
+    console.log(`Fetching weather data for ${location} with units: ${units}`);
+    // Simulate fetching weather data
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({ location, temperature: Math.random() * 100, units });
+      }, 500);
+    });
+  };
+
+  useEffect(() => {
+    console.log('Units changed to:', units);
+
+    // Fetch updated weather data for all favorite locations
+    favorites.forEach((location) => {
+      fetchWeatherData(location, units).then((data) => {
+        setWeatherData((prevData) => ({
+          ...prevData,
+          [location]: {
+            current: data, // Assuming `data` contains current weather
+            forecast: data, // Assuming `data` contains forecast data
+          },
+        }));
+      });
+    });
+  }, [units, favorites]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -49,8 +89,13 @@ function App() {
           onAddFavorite={handleAddFavorite}
           onRemoveFavorite={handleRemoveFavorite}
         />
-        <WeatherDashboard units={units} favorites={favorites} onAddFavorite={handleAddFavorite}
-          onRemoveFavorite={handleRemoveFavorite}/>
+        <WeatherDashboard 
+          units={units} 
+          weatherData={weatherData} // Pass updated weather data
+          favorites={favorites} 
+          onAddFavorite={handleAddFavorite}
+          onRemoveFavorite={handleRemoveFavorite}
+        />
       </Container>
     </ThemeProvider>
   );

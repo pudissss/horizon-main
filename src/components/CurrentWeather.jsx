@@ -2,12 +2,34 @@ import { Box, Typography, Grid } from '@mui/material';
 import ThermostatIcon from '@mui/icons-material/Thermostat';
 import OpacityIcon from '@mui/icons-material/Opacity';
 import AirIcon from '@mui/icons-material/Air';
+import { useEffect, useState } from 'react';
 
 function CurrentWeather({ data, units }) {
   if (!data) return null;
 
+  // Add memo for temperature conversion
+  const convertTemp = (temp) => {
+    if (units === 'imperial') {
+      return (temp * 9/5) + 32;
+    }
+    return temp;
+  };
+
+  // Add memo for wind speed conversion
+  const convertWind = (speed) => {
+    if (units === 'imperial') {
+      return speed * 2.237; // Convert m/s to mph
+    }
+    return speed;
+  };
+
   const tempUnit = units === 'metric' ? '°C' : '°F';
   const windUnit = units === 'metric' ? 'm/s' : 'mph';
+
+  // Convert temperatures based on units
+  const temperature = Math.round(convertTemp(data.main.temp));
+  const feelsLike = Math.round(convertTemp(data.main.feels_like));
+  const windSpeed = Math.round(convertWind(data.wind.speed));
 
   return (
     <Box>
@@ -22,7 +44,7 @@ function CurrentWeather({ data, units }) {
           style={{ width: 80, height: 80 }}
         />
         <Typography variant="h3" sx={{ ml: 2 }}>
-          {Math.round(data.main.temp)}{tempUnit}
+          {temperature}{tempUnit}
         </Typography>
       </Box>
 
@@ -36,7 +58,7 @@ function CurrentWeather({ data, units }) {
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <ThermostatIcon color="primary" sx={{ mr: 1 }} />
             <Typography>
-              Feels like: {Math.round(data.main.feels_like)}{tempUnit}
+              Feels like: {feelsLike}{tempUnit}
             </Typography>
           </Box>
         </Grid>
@@ -52,7 +74,7 @@ function CurrentWeather({ data, units }) {
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <AirIcon color="primary" sx={{ mr: 1 }} />
             <Typography>
-              Wind: {Math.round(data.wind.speed)} {windUnit}
+              Wind: {windSpeed} {windUnit}
             </Typography>
           </Box>
         </Grid>
