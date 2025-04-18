@@ -1,14 +1,34 @@
-import { AppBar, Toolbar, Typography } from '@mui/material';
-import WbSunnyIcon from '@mui/icons-material/WbSunny';
+import { AppBar, Toolbar, Button, Box } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import logo from '../assets/logo.png';
 
 function Header() {
+  const navigate = useNavigate();
+
   return (
-    <AppBar position="static" sx={{ mb: 3 }}>
+    <AppBar position="static">
       <Toolbar>
-        <WbSunnyIcon sx={{ mr: 2 }} />
-        <Typography variant="h6" component="div">
-          Weather Forecast App
-        </Typography>
+        <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+          <img 
+            src={logo} 
+            alt="Horizon Weather Logo" 
+            style={{ 
+              height: '40px',
+              cursor: 'pointer'
+            }}
+            onClick={() => navigate('/')}
+          />
+        </Box>
+        <Button 
+          color="inherit" 
+          onClick={() => navigate('/favorites')}
+          sx={{ mr: 2 }}
+        >
+          Favorites
+        </Button>
+        <Button color="inherit" onClick={() => navigate('/login')}>
+          Login
+        </Button>
       </Toolbar>
     </AppBar>
   );

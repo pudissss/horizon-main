@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Box, Grid, Paper, Typography } from '@mui/material';
+import { Box, Grid, Paper, Typography, Button } from '@mui/material';
+import ThermostatIcon from '@mui/icons-material/Thermostat';
 import WeatherSearch from './WeatherSearch';
 import CurrentWeather from './CurrentWeather';
 import WeatherForecast from './WeatherForecast';
 import { fetchWeatherData } from '../services/weatherApi';
 
-function WeatherDashboard({ units, favorites, onAddFavorite, onRemoveFavorite }) {
+function WeatherDashboard({ units, setUnits, favorites, onAddFavorite, onRemoveFavorite }) {
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isHovering, setIsHovering] = useState(false);
 
   const handleLocationSearch = async (location) => {
     try {
@@ -23,14 +25,40 @@ function WeatherDashboard({ units, favorites, onAddFavorite, onRemoveFavorite })
     }
   };
 
+  const toggleUnits = () => {
+    setUnits(units === 'metric' ? 'imperial' : 'metric');
+  };
+
   return (
     <Box sx={{ flexGrow: 1, mt: 3 }}>
-      <WeatherSearch 
-        onSearch={handleLocationSearch} 
-        onAddFavorite={onAddFavorite} 
-        onRemoveFavorite={onRemoveFavorite} 
-        favorites={favorites} 
-      />
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <WeatherSearch 
+          onSearch={handleLocationSearch} 
+          onAddFavorite={onAddFavorite} 
+          onRemoveFavorite={onRemoveFavorite} 
+          favorites={favorites} 
+        />
+        <Button
+          variant="outlined"
+          startIcon={<ThermostatIcon />}
+          onClick={toggleUnits}
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+          sx={{
+            minWidth: '100px',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              backgroundColor: 'primary.main',
+              color: 'white',
+            }
+          }}
+        >
+          {isHovering 
+            ? `Switch to ${units === 'metric' ? '°F' : '°C'}` 
+            : `${units === 'metric' ? '°C' : '°F'}`
+          }
+        </Button>
+      </Box>
       
       {error && (
         <Typography color="error" sx={{ mt: 2 }}>
