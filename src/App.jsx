@@ -3,10 +3,11 @@ import { Container, CssBaseline, ThemeProvider, createTheme } from '@mui/materia
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import WeatherDashboard from './components/WeatherDashboard';
 import Header from './components/Header';
-import UserPreferences from './components/UserPreferences';
+// import UserPreferences from './components/UserPreferences';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Favorites from './components/Favorites';
+import HomePage from './components/HomePage';
 
 const theme = createTheme({
   palette: {
@@ -114,7 +115,8 @@ function App() {
                 onRemoveFavorite={handleRemoveFavorite}
               />
             } />
-            <Route path="/" element={
+            <Route path="/" element={<HomePage />} />
+            <Route path="/dashboard" element={
               <WeatherDashboard 
                 units={units} 
                 setUnits={setUnits} 
