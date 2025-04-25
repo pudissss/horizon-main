@@ -109,7 +109,6 @@ function App() {
             <Route path="/favorites" element={
               <Favorites 
                 units={units}
-                setUnits={setUnits}
                 favorites={favorites}
                 onAddFavorite={handleAddFavorite}
                 onRemoveFavorite={handleRemoveFavorite}

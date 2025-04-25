@@ -32,12 +32,7 @@ function WeatherDashboard({ units, setUnits, favorites, onAddFavorite, onRemoveF
   return (
     <Box sx={{ flexGrow: 1, mt: 3 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <WeatherSearch 
-          onSearch={handleLocationSearch} 
-          onAddFavorite={onAddFavorite} 
-          onRemoveFavorite={onRemoveFavorite} 
-          favorites={favorites} 
-        />
+        <WeatherSearch onSearch={handleLocationSearch} />
         <Button
           variant="outlined"
           startIcon={<ThermostatIcon />}
@@ -70,7 +65,13 @@ function WeatherDashboard({ units, setUnits, favorites, onAddFavorite, onRemoveF
         <Grid container spacing={3} sx={{ mt: 1 }}>
           <Grid item xs={12} md={6}>
             <Paper elevation={3} sx={{ p: 2 }}>
-              <CurrentWeather data={weatherData.current} units={units} />
+              <CurrentWeather 
+                data={weatherData.current} 
+                units={units}
+                favorites={favorites}
+                onAddFavorite={onAddFavorite}
+                onRemoveFavorite={onRemoveFavorite}
+              />
             </Paper>
           </Grid>
           <Grid item xs={12} md={6}>

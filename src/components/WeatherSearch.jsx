@@ -1,115 +1,94 @@
 import { useState } from 'react';
 import { 
-  Box, 
+  Autocomplete, 
   TextField, 
   IconButton, 
-  List, 
-  ListItem, 
-  ListItemButton, 
-  ListItemText,
-  CircularProgress,
-  Button
+  Box,
+  CircularProgress
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
-function WeatherSearch({ onSearch, favorites, onAddFavorite, onRemoveFavorite }) {
-  const [location, setLocation] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
+function WeatherSearch({ onSearch }) {
+  const [inputValue, setInputValue] = useState('');
+  const [options, setOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (location.trim()) {
-      setIsSearching(true);
-      await onSearch(location.trim());
-      setIsSearching(false);
+  const handleSearch = async (searchText) => {
+    if (!searchText || searchText.length < 2) {
+      setOptions([]);
+      return;
     }
-  };
 
-  const isFavorite = (location) => favorites.includes(location);
-
-  const toggleFavorite = (location) => {
-    if (isFavorite(location)) {
-      onRemoveFavorite(location);
-    } else {
-      onAddFavorite(location);
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `http://api.openweathermap.org/geo/1.0/direct?q=${searchText}&limit=5&appid=1da6c411e4f6bfe94b50efe5befd2f7f`
+      );
+      const data = await response.json();
+      
+      const locations = data.map(item => ({
+        label: `${item.name}, ${item.country}${item.state ? `, ${item.state}` : ''}`,
+        value: item.name
+      }));
+      
+      setOptions(locations);
+    } catch (error) {
+      console.error('Error fetching locations:', error);
+      setOptions([]);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <Box>
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
+    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', width: '100%' }}>
+      <Autocomplete
+        fullWidth
+        freeSolo
+        options={options}
+        inputValue={inputValue}
+        onInputChange={(event, newValue) => {
+          setInputValue(newValue);
+          handleSearch(newValue);
+        }}
+        onChange={(event, newValue) => {
+          if (newValue) {
+            if (typeof newValue === 'string') {
+              onSearch(newValue);
+            } else {
+              onSearch(newValue.value);
+            }
+          }
+        }}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            placeholder="Search location..."
+            size="small"
+            InputProps={{
+              ...params.InputProps,
+              endAdornment: (
+                <>
+                  {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                  {params.InputProps.endAdornment}
+                </>
+              ),
+            }}
+          />
+        )}
+      />
+      <IconButton 
+        onClick={() => onSearch(inputValue)}
         sx={{
-          display: 'flex',
-          gap: 1,
-          mb: 2
+          bgcolor: 'primary.main',
+          color: 'white',
+          '&:hover': {
+            bgcolor: 'primary.dark',
+          }
         }}
       >
-        <TextField
-          fullWidth
-          label="Enter city name"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          variant="outlined"
-          placeholder="e.g., London, New York, Tokyo"
-          disabled={isSearching}
-        />
-        <IconButton 
-          type="submit" 
-          color="primary" 
-          aria-label="search"
-          disabled={isSearching}
-        >
-          {isSearching ? <CircularProgress size={24} /> : <SearchIcon />}
-        </IconButton>
-        {location && (
-          <Button
-            onClick={() => toggleFavorite(location)}
-            startIcon={isFavorite(location) ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-            variant="outlined"
-            disabled={isSearching}
-          >
-            {isFavorite(location) ? 'Remove' : 'Add'}
-          </Button>
-        )}
-      </Box>
-
-      {favorites.length > 0 && (
-        <List sx={{ 
-          mt: 1, 
-          bgcolor: 'background.paper',
-          borderRadius: 1,
-          boxShadow: 1
-        }}>
-          {favorites.map((favorite) => (
-            <ListItem 
-              key={favorite} 
-              disablePadding
-              secondaryAction={
-                <IconButton 
-                  edge="end" 
-                  onClick={() => onRemoveFavorite(favorite)}
-                  color="primary"
-                >
-                  <FavoriteIcon />
-                </IconButton>
-              }
-            >
-              <ListItemButton onClick={() => onSearch(favorite)}>
-                <ListItemText 
-                  primary={favorite}
-                  primaryTypographyProps={{
-                    sx: { fontWeight: 500 }
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-      )}
+        <SearchIcon />
+      </IconButton>
     </Box>
   );
 }
